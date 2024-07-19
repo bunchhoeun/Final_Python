@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for,flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import sqlite3
 from datetime import datetime
@@ -62,6 +62,7 @@ def product():
                 'id': item[0],
                 'title': item[1],
                 'price': item[3],
+                'qty': item[2],
                 'category': item[4],
                 'description': item[5],
                 'image': image,
@@ -114,22 +115,23 @@ def about():
 
 @app.get('/contact')
 def contact():
-    return render_template("contact.html",  module='contact')
+    return render_template("contact.html", module='contact')
 
 
 @app.get('/jinja')
 def jinja():
-    return render_template('jinja.html',  module='jinja')
+    return render_template('jinja.html', module='jinja')
 
 
 @app.get('/add_product')
 def add_product():
-    return render_template('add_product.html',  module='add_product')
+    return render_template('add_product.html', module='add_product')
 
 
 @app.post('/submit_new_product')
 def submit_new_product():
     title = request.form.get('title')
+    qty = request.form.get('qty')
     price = request.form.get('price')
     category = request.form.get('category')
     description = request.form.get('description')
@@ -153,8 +155,8 @@ def submit_new_product():
 
     # Use parameterized query to prevent SQL injection
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO `product` (title, cost, price, category, description, image) VALUES (?, ?, ?, ?, ?, ?)",
-                   (title, 0, price, category, description, filename))
+    cursor.execute("INSERT INTO `product` (title, qty, price, category, description, image) VALUES (?, ?, ?, ?, ?, ?)",
+                   (title, qty, price, category, description, filename))
     conn.commit()
     flash("Product created successfully", "success")
     return redirect(url_for('product'))
@@ -177,15 +179,15 @@ def edit_product():
             image = 'no_image'
         else:
             image = item[6]
-        product ={
-                'id': item[0],
-                'title': item[1],
-                'cost': item[2],
-                'price': item[3],
-                'category': item[4],
-                'description': item[5],
-                'image': image,
-            }
+        product = {
+            'id': item[0],
+            'title': item[1],
+            'qty': item[2],
+            'price': item[3],
+            'category': item[4],
+            'description': item[5],
+            'image': image,
+        }
     return render_template('edit_product.html', product=product, module='add_product')
 
 
@@ -241,11 +243,10 @@ def update():
     return redirect(url_for('product'))
 
 
-
 @app.get('/product_destroy')
 def product_destroy():
     product_id = request.args.get('id')
-    image_name=''
+    image_name = ''
     file = conn.execute("""SELECT image FROM product where id =?""", (product_id,))
     for item in file:
         image_name = item[0]

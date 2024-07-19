@@ -41,19 +41,25 @@
                         </div>
                         <div class="form-group">
                             <label for="price">Price</label>
-                            <input required type="number" class="form-control" id="price" name="price" autocomplete="off">
+                            <input required type="number" class="form-control" id="price" name="price"
+                                   autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="qty">Quantity</label>
+                            <input required type="number" class="form-control" id="qty" name="qty"
+                                   autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="category">Category</label>
                             <select required class="form-control" id="category" name="category">
                                 <option value="drink">Drink</option>
-                                <option value="water" selected>Water</option>
-                                <option value="beer">Beer</option>
+                                <option value="food">Food</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea required class="form-control" id="description" name="description" rows="5"></textarea>
+                            <textarea required class="form-control" id="description" name="description"
+                                      rows="5"></textarea>
                         </div>
                         <button onclick="window.location.href='{{ url_for('product') }}'" type="button"
                                 class="btn btn-danger">Cancel
@@ -96,21 +102,12 @@
         if (file) {
             reader.readAsDataURL(file);
         }
-        new Compressor(fileInput.files[0], {
-            quality: 0.6,
-            success(compressedFile) {
-                console.log('Compressed original file:', compressedFile);
-
-                // Append compressed Blob to formData
-                formData.append('compress_file', compressedFile, compressedFile.name);
-            }
-        });
     }
 
     // Submit form with AJAX
     $(document).ready(function () {
         $('form[name="addProductForm"]').submit(function (event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
             // Check if cropper is initialized and an image is selected
             if (!cropper) {
@@ -127,12 +124,12 @@
             cropper.getCroppedCanvas().toBlob((croppedBlob) => {
                 const formData = new FormData($('form[name="addProductForm"]')[0]);
                 const fileInput = document.getElementById('file');
-                
+
                 formData.append('cropped_image', croppedBlob, fileInput.files[0].name);
 
                 // Submit form with AJAX
                 submitFormData(formData);
-            
+
             });
         });
 

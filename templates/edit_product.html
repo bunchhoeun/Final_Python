@@ -11,53 +11,10 @@
         <div class="col-md-12">
             {% include "navbar.html" %}
         </div>
-        {#        <div class="col-md-12 mt-5">#}
-        {#            <div class="table-responsive">#}
-        {#                <table id="product_table" class="display">#}
-        {#                    <thead>#}
-        {#                    <tr>#}
-        {#                        <th>No.</th>#}
-        {#                        <th>Image</th>#}
-        {#                        <th>Title</th>#}
-        {#                        <th>Cost</th>#}
-        {#                        <th>Price</th>#}
-        {#                        <th>Description</th>#}
-        {#                        <th>Action</th>#}
-        {#                    </tr>#}
-        {#                    </thead>#}
-        {#                    <tbody>#}
-        {#                    {% for item in data %}#}
-        {#                        <tr>#}
-        {#                            <td>{{ loop.index }}</td>#}
-        {#                            <td>#}
-        {#                                <img#}
-        {#                                        style="width: 15%;"#}
-        {#                                        src="/static/image/no-image.png"#}
-        {#                                >#}
-        {#                            </td>#}
-        {#                            <td>{{ item['title'] }}</td>#}
-        {#                            <td>{{ item['cost'] }}</td>#}
-        {#                            <td>{{ item['price'] }}</td>#}
-        {#                            <td>{{ item['description'] }}</td>#}
-        {#                            <td>#}
-        {#                                <a href="#" class="btn btn-sm btn-outline-primary">#}
-        {#                                    <i class="far fa-edit"></i>#}
-        {#                                </a>#}
-        {#                                <a href="#" class="btn btn-sm btn-outline-danger">#}
-        {#                                    <i class="far fa-trash-alt"></i>#}
-        {#                                </a>#}
-        {#                            </td>#}
-        {#                        </tr>#}
-        {#                    {% endfor %}#}
-        {#                    </tbody>#}
-        {#                </table>#}
-        {#            </div>#}
-        {#        </div>#}
         <div class="col-md-12 mt-5">
             <div class="card">
                 <div class="card-header">
                     <h3>Edit Product</h3>
-                    {#                    {{product}}#}
                 </div>
                 <div class="card-body">
                     <form action="{{ url_for('update') }}" method="post" name="editProductForm"
@@ -109,19 +66,17 @@
                             {#                            {{ product['category'] }}#}
                             <label for="category">Category</label>
                             <select required class="form-control" id="category" name="category">
-                                <option {{ 'selected' if product['category']=='drink' else '' }} value="drink">drink
+                                <option {{ 'selected' if product['category']=='drink' else '' }} value="drink">Drink
                                 </option>
-                                <option {{ 'selected' if product['category']=='water' else '' }} value="water">water
-                                </option>
-                                <option {{ 'selected' if product['category']=='beer' else '' }} value="beer">beer
+                                <option {{ 'selected' if product['category']=='food' else '' }} value="food">Food
                                 </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
                             <textarea required
-                                    class="form-control" id="description" name="description"
-                                    rows="5"
+                                      class="form-control" id="description" name="description"
+                                      rows="5"
                             >{{ product['description'] }}</textarea>
                         </div>
                         <button onclick="window.location.href='/product'" type="reset" class="btn btn-danger">Cancel
@@ -141,173 +96,162 @@
         integrity="sha512-nOF0eaRH61urlpNZ0Fv7bmeiD3zDKhHsO0qmK2JdepJLAKSrekIIgjeVTs/wEG4S412984RK+0nSkBYA4SdSaw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-// Initialize Cropper object
-let cropper;
+    // Initialize Cropper object
+    let cropper;
 
-function showMyImage(fileInput) {
-    const file = fileInput.files[0];
-    const reader = new FileReader();
+    function showMyImage(fileInput) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-    reader.onload = function (e) {
-        const image = document.getElementById('thumbnail');
-        image.setAttribute('src', e.target.result);
+        reader.onload = function (e) {
+            const image = document.getElementById('thumbnail');
+            image.setAttribute('src', e.target.result);
 
-        // Initialize Cropper.js after image is loaded
-        if (cropper) {
-            cropper.destroy();
-        }
-        cropper = new Cropper(image, {
-            aspectRatio: 0, // Set your desired aspect ratio for cropping
-        });
-
-    };
-    if (file) {
-        reader.readAsDataURL(file);
-    } else {
-        initializeCropper();
-    }
-
-    if (file) {
-        new Compressor(file, {
-            quality: 0.6,
-            success(compressedFile) {
-                console.log('Compressed original file:', compressedFile);
-                // Append compressed Blob to formData
-                formData.append('compress_file', compressedFile, compressedFile.name);
+            // Initialize Cropper.js after image is loaded
+            if (cropper) {
+                cropper.destroy();
             }
-        });
-    }
-}
-
-function initializeCropper() {
-    const image = document.getElementById('thumbnail');
-
-    if (image && image.src) {
-        if (cropper) {
-            cropper.destroy();
-        }
-        cropper = new Cropper(image, {
-            aspectRatio: 0, // Set your desired aspect ratio for cropping
-        });
-    }
-}
-
-// Submit form with AJAX
-$(document).ready(function () {
-    initializeCropper(); // Call the initialization function
-    $('form[name="editProductForm"]').submit(function (event) {
-        event.preventDefault(); // Prevent default form submission
-
-        // Check if cropper is initialized and an image is selected
-        if (!cropper) {
-            console.error('Cropper.js not initialized or no image selected');
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Please select an image and crop it",
+            cropper = new Cropper(image, {
+                aspectRatio: 0, // Set your desired aspect ratio for cropping
             });
-            return;
+
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            initializeCropper();
         }
 
-        // Get cropped image blob
-        cropper.getCroppedCanvas().toBlob((croppedBlob) => {
-            const formData = new FormData($('form[name="editProductForm"]')[0]);
-            const fileInput = document.getElementById('file');
-            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    }
 
-            if (fileInput.files.length === 0) {
-                // No new file selected, only save cropped image
-                formData.append('cropped_image', croppedBlob, 'cropped_image.png');
-                submitFormData(formData);
-            } else {
-                // Check if original file size exceeds 2MB
-                if (fileInput.files[0].size > maxSize) {
-                    console.log('Original file size exceeds 2MB. Compressing...');
+    function initializeCropper() {
+        const image = document.getElementById('thumbnail');
 
-                    // Compress original file using Compressor.js
-                    new Compressor(fileInput.files[0], {
-                        quality: 0.6,
-                        success(compressedFile) {
-                            console.log('Compressed original file:', compressedFile);
-
-                            // Append compressed Blob to formData
-                            formData.append('compress_file', compressedFile, compressedFile.name);
-
-                            // Check if cropped image blob size exceeds 2MB
-                            if (croppedBlob.size > maxSize) {
-                                console.log('Cropped image size exceeds 2MB. Compressing...');
-
-                                // Compress cropped image using Compressor.js
-                                new Compressor(croppedBlob, {
-                                    quality: 0.6,
-                                    success(compressedCropped) {
-                                        console.log('Compressed cropped image:', compressedCropped);
-
-                                        // Append compressed Blob to formData
-                                        formData.append('cropped_image', compressedCropped, fileInput.files[0].name);
-
-                                        // Submit form with AJAX
-                                        submitFormData(formData);
-                                    },
-                                    error(err) {
-                                        console.error('Compression error:', err);
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: "Failed to compress the cropped image.",
-                                        });
-                                    },
-                                });
-                            } else {
-                                // Append original cropped image blob to formData
-                                formData.append('cropped_image', croppedBlob, fileInput.files[0].name);
-
-                                // Submit form with AJAX
-                                submitFormData(formData);
-                            }
-                        },
-                        error(err) {
-                            console.error('Compression error:', err);
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: "Failed to compress the original file.",
-                            });
-                        },
-                    });
-                } else {
-                    // Append original file to formData
-                    formData.append('cropped_image', croppedBlob, fileInput.files[0].name);
-
-                    // Submit form with AJAX
-                    submitFormData(formData);
-                }
+        if (image && image.src) {
+            if (cropper) {
+                cropper.destroy();
             }
-        });
-    });
+            cropper = new Cropper(image, {
+                aspectRatio: 0, // Set your desired aspect ratio for cropping
+            });
+        }
+    }
 
-    function submitFormData(formData) {
-        // AJAX submission
-        $.ajax({
-            url: '{{ url_for('update') }}',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                window.location.href = '/redirect_with_success';
-            },
-            error: function (xhr, status, error) {
+    // Submit form with AJAX
+    $(document).ready(function () {
+        initializeCropper(); // Call the initialization function
+        $('form[name="editProductForm"]').submit(function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Check if cropper is initialized and an image is selected
+            if (!cropper) {
+                console.error('Cropper.js not initialized or no image selected');
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text: "Cannot crop an non-image(please insert a new image)",
+                    text: "Please select an image and crop it",
                 });
+                return;
             }
-        });
-    }
-});
 
+            // Get cropped image blob
+            cropper.getCroppedCanvas().toBlob((croppedBlob) => {
+                const formData = new FormData($('form[name="editProductForm"]')[0]);
+                const fileInput = document.getElementById('file');
+                const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+
+                if (fileInput.files.length === 0) {
+                    // No new file selected, only save cropped image
+                    formData.append('cropped_image', croppedBlob, 'cropped_image.png');
+                    submitFormData(formData);
+                } else {
+                    // Check if original file size exceeds 2MB
+                    if (fileInput.files[0].size > maxSize) {
+                        console.log('Original file size exceeds 2MB. Compressing...');
+
+                        // Compress original file using Compressor.js
+                        new Compressor(fileInput.files[0], {
+                            quality: 0.6,
+                            success(compressedFile) {
+                                console.log('Compressed original file:', compressedFile);
+
+                                // Append compressed Blob to formData
+                                formData.append('compress_file', compressedFile, compressedFile.name);
+
+                                // Check if cropped image blob size exceeds 2MB
+                                if (croppedBlob.size > maxSize) {
+                                    console.log('Cropped image size exceeds 2MB. Compressing...');
+
+                                    // Compress cropped image using Compressor.js
+                                    new Compressor(croppedBlob, {
+                                        quality: 0.6,
+                                        success(compressedCropped) {
+                                            console.log('Compressed cropped image:', compressedCropped);
+
+                                            // Append compressed Blob to formData
+                                            formData.append('cropped_image', compressedCropped, fileInput.files[0].name);
+
+                                            // Submit form with AJAX
+                                            submitFormData(formData);
+                                        },
+                                        error(err) {
+                                            console.error('Compression error:', err);
+                                            Swal.fire({
+                                                icon: "error",
+                                                title: "Oops...",
+                                                text: "Failed to compress the cropped image.",
+                                            });
+                                        },
+                                    });
+                                } else {
+                                    // Append original cropped image blob to formData
+                                    formData.append('cropped_image', croppedBlob, fileInput.files[0].name);
+
+                                    // Submit form with AJAX
+                                    submitFormData(formData);
+                                }
+                            },
+                            error(err) {
+                                console.error('Compression error:', err);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Oops...",
+                                    text: "Failed to compress the original file.",
+                                });
+                            },
+                        });
+                    } else {
+                        // Append original file to formData
+                        formData.append('cropped_image', croppedBlob, fileInput.files[0].name);
+
+                        // Submit form with AJAX
+                        submitFormData(formData);
+                    }
+                }
+            });
+        });
+
+        function submitFormData(formData) {
+            // AJAX submission
+            $.ajax({
+                url: '{{ url_for('update') }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    window.location.href = '/redirect_with_success';
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Cannot crop an non-image(please insert a new image)",
+                    });
+                }
+            });
+        }
+    });
 
 
 </script>
